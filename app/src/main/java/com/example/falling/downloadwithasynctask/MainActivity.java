@@ -8,6 +8,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,25 +48,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.download_button:
-                if (InternetUtil.isNetworkConnected(v.getContext())) {
-                    //查看权限
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        //申请WRITE_EXTERNAL_STORAGE权限
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                REQUEST_CODE);
-                    } else {
-                        if (!isDownloading) {
-                            myTask = new MyTask();
-                            isDownloading = true;
-                            myTask.execute(mUrlText.getText().toString());
+                String url = mUrlText.getText().toString();
+                if(url != null && url.length() > 0 ) {
+                    if (InternetUtil.isNetworkConnected(v.getContext())) {
+                        //查看权限
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            //申请WRITE_EXTERNAL_STORAGE权限
+                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    REQUEST_CODE);
                         } else {
-                            isDownloading = false;
-                            myTask.cancel(true);
+                            if (!isDownloading) {
+                                myTask = new MyTask();
+                                isDownloading = true;
+                                myTask.execute(url);
+                            } else {
+                                isDownloading = false;
+                                myTask.cancel(true);
+                            }
                         }
+                    } else {
+                        Toast.makeText(v.getContext(), getString(R.string.error_network), Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(v.getContext(), getString(R.string.error_network), Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(v.getContext(), getString(R.string.error_URL), Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -145,7 +151,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (aBoolean) {
                 Toast.makeText(MainActivity.this, "下载完成，目录在 " + mDownloadFileName, Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(MainActivity.this, "下载失败，是否有权限？", Toast.LENGTH_SHORT).show();
+                mProgressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(MainActivity.this, "下载失败，URL是否正确？", Toast.LENGTH_SHORT).show();
             }
         }
 
