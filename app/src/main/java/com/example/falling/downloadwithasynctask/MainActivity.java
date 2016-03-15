@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.download_button:
                 String url = mUrlText.getText().toString();
-                if(url != null && url.length() > 0 ) {
+                if(url.length() > 0 ) {
                     if (InternetUtil.isNetworkConnected(v.getContext())) {
                         //查看权限
                         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -108,19 +108,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("tag", "doInBack");
             String strUrl = params[0];
             try {
-                URL url = new URL(strUrl);
+                 URL url = new URL(strUrl);
                 URLConnection urlConnection = url.openConnection();
                 inputStream = urlConnection.getInputStream();
                 TotalSize = urlConnection.getContentLength();
                 //设置文件夹路径和文件路径
                 setFoldFileName(strUrl);
-                outputStream = new FileOutputStream(fileName);
 
                 if (checkFoldAndFile(foldName, fileName)) {
                     inputStream.close();
                     outputStream.close();
                     return false;
                 }
+                outputStream = new FileOutputStream(fileName);
 
                 //下载
                 startDownload();
@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             } catch (IOException e) {
                 e.printStackTrace();
-            } finally {
             }
             return false;
         }
@@ -147,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
+            isDownloading = false;
             mDownloadButton.setText("下载");
             if (aBoolean) {
                 Toast.makeText(MainActivity.this, "下载完成，目录在 " + mDownloadFileName, Toast.LENGTH_LONG).show();
@@ -185,6 +185,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             fileName = new File(mDownloadFileName);
             foldName = new File(mDownloadFolderName);
+            Log.i("path",mDownloadFileName);
+            Log.i("path",mDownloadFolderName);
         }
 
         /**
