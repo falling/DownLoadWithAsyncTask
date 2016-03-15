@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private class MyTask extends AsyncTask<String, Integer, Boolean> {
-        private int TotalSize; //总文件大小
+        private long TotalSize; //总文件大小
         private InputStream inputStream; //下载的流
         private File fileName;
         private File foldName;
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                  URL url = new URL(strUrl);
                 URLConnection urlConnection = url.openConnection();
                 inputStream = urlConnection.getInputStream();
-                TotalSize = urlConnection.getContentLength();
+                TotalSize = (long) urlConnection.getContentLength();
                 //设置文件夹路径和文件路径
                 setFoldFileName(strUrl);
 
@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * @throws IOException
          */
         private void startDownload() throws IOException {
-            int downloadSize = 0;
+            long downloadSize = 0;
             byte[] bytes = new byte[2048];
             int length;
             int progress;
@@ -203,7 +203,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 outputStream.write(bytes, 0, length);
                 outputStream.flush();
                 downloadSize += length;
-                progress = downloadSize * 100 / TotalSize;
+                progress = (int) (downloadSize * 100L / TotalSize);
+                Log.i("progress",progress+"");
                 publishProgress(progress);
             }
         }
